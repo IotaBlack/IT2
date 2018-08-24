@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Events</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <div id="div"></div>
+    <button onclick="div.innerHTML = 'This is text!'">TEXT!</button><br>
+    <button onclick="div.innerHTML = '\<img src=\'img.png\'/>'">IMAGE!</button><br>
+    <input type="text" onchange="div.innerHTML = this.value"/><br>
+    <button onclick="document.getElementById('hello').value = 'HELLO!'">HELLO!</button><br>
+    <input id="hello" type="text"/>
+    <script>div = document.getElementById('div')</script>
+</body>
+</html>
