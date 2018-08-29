@@ -16,6 +16,7 @@ async function getSha() {
 }
 
 async function getRawTree() {
+    //Gets the raw treedata
     var tree = await getSha()
     return new Promise(resolve => {
         var xhr = new XMLHttpRequest()
@@ -28,13 +29,14 @@ async function getRawTree() {
 }
 
 function parseTree(rawTree) {
+    //Parses the raw tree
     var tree = { content: {}, sha: rawTree.sha, url: rawTree.url }
     for (let i = 0; i < rawTree.tree.length; i++) {
         const element = rawTree.tree[i];
         /**@type {Array} */
         var path = element.path.split('/')
         if(path[path.length-1] == 'DESCRIPTION.TXT'){
-            getDesc(element.path).then(loadDesc)
+            getTextFile(element.path).then(loadDesc)
             continue
         }
         var target = tree
@@ -48,6 +50,7 @@ function parseTree(rawTree) {
 }
 
 async function loadTree() {
+    //loads the tree to the DOM
     var tree = parseTree(await getRawTree())
     return new Promise(resolve => {
         var div = document.getElementById('tree')
@@ -57,18 +60,24 @@ async function loadTree() {
             var files = []
             for (const key in item.content) {
                 const element = item.content[key];
+                /**@description main element (contains name and content) */
                 var DOMElement = document.createElement('div')
                 DOMElement.classList.add('item')
                 DOMElement.id = element.path
 
-                var DOMElementButton = document.createElement('div')
-                DOMElementButton.classList.add('treeButton')
-                DOMElementButton.classList.add('closed')
-                DOMElement.appendChild(DOMElementButton)
-                DOMElementButton.innerHTML = '&#9634'
+                /**@description button to expand a folder */
+                var Button = document.createElement('div')
+                Button.classList.add('treeButton')
+                Button.classList.add('closed')
+                DOMElement.appendChild(Button)
+                //sets the file icon
+                Button.innerHTML = '&#9634'
+                //if element is a folder
+                //set the icon to an arrow and add functionality
                 if (element.type == 'tree') {
-                    DOMElementButton.innerHTML = '&#9654'
-                    DOMElementButton.addEventListener('click', e => {
+                    Button.innerHTML = '&#9654'
+                    Button.addEventListener('click', e => {
+                        //open the folder
                         if (e.target.classList.contains('closed')) {
                             e.path[1].classList.remove('closed')
                             e.target.classList.remove('closed')
@@ -76,6 +85,7 @@ async function loadTree() {
 
                             e.target.innerHTML = '&#9660'
 
+                        //close the folder
                         } else if (e.target.classList.contains('open')) {
                             e.target.classList.remove('open')
                             e.path[1].classList.add('closed')
@@ -86,18 +96,21 @@ async function loadTree() {
                     })
                 }
 
-                var DOMElement2 = document.createElement('div')
-                DOMElement2.innerHTML = element.path.split('/').pop()
-                DOMElement2.dataset.path = element.path
-                DOMElement2.classList.add('name')
-                DOMElement2.addEventListener('click', e => {
+                /**@description contains the name of the file/folder */
+                var name = document.createElement('div')
+                name.innerHTML = element.path.split('/').pop()
+                name.dataset.path = element.path
+                name.classList.add('name')
+                name.addEventListener('click', e => {
                     viewDesc(e.target.dataset.path)
                 })
-                if(element.type != 'tree'){DOMElement2.addEventListener('dblclick', e =>{
+                //if item is a file add a link to it
+                if(element.type != 'tree'){name.addEventListener('dblclick', e =>{
                     window.open(baseURL.page + e.target.dataset.path)
                 })}
-                DOMElement.appendChild(DOMElement2)
+                DOMElement.appendChild(name)
 
+                //if folder load the contents
                 if (element.type == 'tree') {
                     DOMElement.classList.add('tree')
                     DOMElement.classList.add('closed')
@@ -108,6 +121,7 @@ async function loadTree() {
                     files.push(DOMElement)
                 }
             }
+            //add files to the end of the list
             for (let i = 0; i < files.length; i++) {
                 parent.appendChild(files[i])
             }
@@ -117,8 +131,8 @@ async function loadTree() {
     })
 
 }
-
-async function getDesc(path){
+/**@description gets the text content of a file given a path */
+async function getTextFile(path){
     return new Promise(resolve => {
         var xhr = new XMLHttpRequest()
         xhr.open('GET', baseURL.raw + path, true)
@@ -129,6 +143,7 @@ async function getDesc(path){
     })
 }
 
+/**@description parses and collects descriptions in one place */
 async function loadDesc(text){
     var descriptions = text.split('#')
     for (let i = 1; i < descriptions.length; i += 2) {
@@ -137,6 +152,7 @@ async function loadDesc(text){
     }
 }
 
+/**@description puts description in an element(ID="desc") given a path */
 function viewDesc(path){
     var box = document.getElementById('desc')
     box.innerHTML = Descriptions[path] || 'This item has no description.'
