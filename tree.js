@@ -1,4 +1,6 @@
-var baseURL = { api: 'https://api.github.com/repos/TheGrandCircuit/IT2/', raw: 'https://raw.githubusercontent.com/TheGrandCircuit/IT2/master/' }
+var baseURL = { api: 'https://api.github.com/repos/TheGrandCircuit/IT2/',
+                raw: 'https://raw.githubusercontent.com/TheGrandCircuit/IT2/master/',
+                page: 'https://thegrandcircuit.github.io/IT2/' }
 var Descriptions = {}
 async function getSha() {
     return new Promise(resolve => {
@@ -32,7 +34,7 @@ function parseTree(rawTree) {
         /**@type {Array} */
         var path = element.path.split('/')
         if(path[path.length-1] == 'DESCRIPTION.TXT'){
-            getDesc(path).then(loadDesc)
+            getDesc(element.path).then(loadDesc)
             continue
         }
         var target = tree
@@ -91,6 +93,9 @@ async function loadTree() {
                 DOMElement2.addEventListener('click', e => {
                     viewDesc(e.target.dataset.path)
                 })
+                if(element.type != 'tree'){DOMElement2.addEventListener('dblclick', e =>{
+                    window.open(baseURL.page + e.target.dataset.path)
+                })}
                 DOMElement.appendChild(DOMElement2)
 
                 if (element.type == 'tree') {

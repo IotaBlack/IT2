@@ -7,6 +7,7 @@
     cursor: context-menu;
     width: 50%;
     float: left;
+    user-select: none;
 }
 
 .desc {
