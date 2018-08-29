@@ -6,24 +6,25 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>MVA Calculator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
 
-    <body>
-        <input type="number" id="input" onchange="onChange()" />
-        <select id="mva" onchange="onChange()">
-            <option value="1.25">General(25%)</option>
-            <option value="1.15">Food(15%)</option>
-            <option value="1.08">Transport(8%)</option>
-        </select>
-        <h4 id="out"></h4>
+<body>
+    <input type="number" id="input" onchange="onChange()" />
+    <select id="mva" onchange="onChange()">
+        <option value="1.25">General(25%)</option>
+        <option value="1.15">Food(15%)</option>
+        <option value="1.08">Transport(8%)</option>
+    </select>
+    <h4 id="out"></h4>
 
-        <script>
-            out = document.getElementById('out')
-            input = document.getElementById('input')
-            mva = document.getElementById('mva')
-            function onChange() {
-                out.innerHTML = input.value * mva.value
-            }
-        </script>
-    </body>
+    <script>
+        out = document.getElementById('out')
+        input = document.getElementById('input')
+        mva = document.getElementById('mva')
+        function onChange() {
+            out.innerHTML = input.value * mva.value
+        }
+    </script>
+</body>
 
 </html>
