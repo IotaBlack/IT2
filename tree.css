@@ -1,0 +1,53 @@
+.name {
+    background-color: cyan;
+    height: 25px;
+}
+
+#tree {
+    cursor: context-menu;
+    width: 50%;
+    float: left;
+}
+
+.desc {
+    height: 50%;
+    width: 50%;
+    background-color: aquamarine;
+    float: left;
+}
+.desc>h1 {
+    margin: 0;
+}
+
+.tree {
+    background-color: crimson;
+    overflow: hidden;
+}
+
+.tree:hover {
+    height: unset;
+}
+
+.treeButton {
+    width: 25px;
+    height: 22px;
+    padding-top: 3px;
+    float: left;
+    background: red;
+    text-align: center;
+    margin-right: 5px;
+}
+
+.indent {
+    height: 25px;
+    width: 25px;
+    float: left;
+}
+
+.item {
+    margin-left: 25px;
+}
+
+.closed > .item {
+    display: none;
+}
