@@ -12,7 +12,8 @@
 
 <body>
     <svg height=500 width=500>
-        <line id="line" x1="250" y1="250" x2="300" y2="400" style="stroke:black;stroke-width:3" />
+            <line id="line" x1="250" y1="250" x2="300" y2="400" style="stroke:black;stroke-width:3" />
+            <line id="line2" x1="250" y1="250" x2="300" y2="400" style="stroke:red;stroke-width:3" />
     </svg>
     <div>
         <h5 id="x"></h5>
@@ -25,6 +26,7 @@
         var y = document.getElementById('y')
         var z = document.getElementById('z')
         var line = document.getElementById('line')
+        var line2 = document.getElementById('line2')
         window.addEventListener('deviceorientation',e => {
             x.innerHTML = e.alpha
             y.innerHTML = e.beta
@@ -33,6 +35,9 @@
 
             line.x2.baseVal.value = 250 + (e.gamma*10)
             line.y2.baseVal.value = 250 + (e.beta*10)
+
+            line2.x2.baseVal.value = 250 + Math.sin(e.alpha)
+            line2.y2.baseVal.value = 250 + Math.cos(e.alpha)
 
         })
         function update(){
