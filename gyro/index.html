@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>gyro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script src="main.js"></script>
+</head>
+
+<body>
+    <svg height=500 width=500>
+        <line x1="250" y1="250" x2="300" y2="400" style="stroke:black;stroke-width:3" />
+    </svg>
+    <div>
+        <h5 id="x"></h5>
+        <h5 id="y"></h5>
+        <h5 id="z"></h5>
+    </div>
+
+    <script>
+        x = document.getElementById('x')
+        y = document.getElementById('y')
+        z = document.getElementById('z')
+        window.addEventListener('devicemotion',e => {
+            x.innerHTML = e.acceleration.x
+            y.innerHTML = e.acceleration.y
+            z.innerHTML = e.acceleration.z
+        })
+        function update(){
+
+        }
+    </script>
+</body>
+
+</html>
