@@ -1,0 +1,3 @@
+#crashBrowser#
+<h1>BEWARE<h1/>
+Crashes most browsers.
