@@ -25,11 +25,13 @@
         var y = document.getElementById('y')
         var z = document.getElementById('z')
         var line = document.getElementById('line')
-        window.addEventListener('devicemotion',e => {
-            x.innerHTML = e.acceleration.x
-            y.innerHTML = e.acceleration.y
-            z.innerHTML = e.acceleration.z
+        window.addEventListener('deviceorientation',e => {
+            x.innerHTML = e.alpha
+            y.innerHTML = e.beta
+            z.innerHTML = e.gamma
             
+            e.
+
             line.x2.baseVal.value = 250 + (e.acceleration.x*1000)
             line.y2.baseVal.value = 250 + (e.acceleration.y*1000)
 
