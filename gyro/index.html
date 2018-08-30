@@ -12,7 +12,7 @@
 
 <body>
     <svg height=500 width=500>
-        <line x1="250" y1="250" x2="300" y2="400" style="stroke:black;stroke-width:3" />
+        <line id="line" x1="250" y1="250" x2="300" y2="400" style="stroke:black;stroke-width:3" />
     </svg>
     <div>
         <h5 id="x"></h5>
@@ -21,13 +21,18 @@
     </div>
 
     <script>
-        x = document.getElementById('x')
-        y = document.getElementById('y')
-        z = document.getElementById('z')
+        var x = document.getElementById('x')
+        var y = document.getElementById('y')
+        var z = document.getElementById('z')
+        var line = document.getElementById('line')
         window.addEventListener('devicemotion',e => {
             x.innerHTML = e.acceleration.x
             y.innerHTML = e.acceleration.y
             z.innerHTML = e.acceleration.z
+            
+            line.x2.baseVal.value = 250 + (e.acceleration.x*1000)
+            line.y2.baseVal.value = 250 + (e.acceleration.y*1000)
+
         })
         function update(){
 
