@@ -17,7 +17,7 @@ var dcvs = new Canvas(ctx.getImageData(0, 0, cvs.width, cvs.height))
 var list = new Array(numItems)
 
 for (let i = 0; i < list.length; i++) {
-    list[i] = i
+    list[i] = list.length - i
 }
 
 function shuffle(arr) {
@@ -29,7 +29,6 @@ function shuffle(arr) {
     }
 }
 
-shuffle(list)
 
 
 var sorts = {
@@ -118,9 +117,10 @@ var sorts = {
 
         if (left < right) {
             //Partition
-            pivot = right;
-            var pivotValue = arr[pivot],
-
+            pivot = right
+            this.swap(arr,Random(left,right),right);
+            var pivotValue = arr[pivot]
+                console.log(pivotValue)
                 partitionIndex = left;
             yield { marker: 'red', index: pivot, value: pivotValue }
             for (var i = left; i < right; i++) {
@@ -195,17 +195,37 @@ sorts.merge.merge = function* (arr, left, mid, right) {
 
     for (let i = 0; i < result.length; i++) {
         arr[left + i] = result[i];
-
+        sorts.swap(arr,left+i,left+i)
         yield { marker: 'blue', index: left+i }
     }
 }
 
+var sort
 //var sort = sorts.bubble(list)
 //var sort = sorts.selection(list)
 //var sort = sorts.insertion(list)
-var sort = sorts.merge(list, 0, list.length-1)
+//var sort = sorts.merge(list, 0, list.length-1)
 //var sort = sorts.quick(list, 0, list.length - 1)
 //var sort = sorts.binaryQuick(list, 0, list.length - 1, 1)
+
+var input = {
+    shuffle: function(){
+        shuffle(list)
+        Draw()
+    },
+
+    changeSpeed: function(value){
+        iterationsPerFrame = value
+    },
+
+    start: function(){
+        update()
+    },
+
+    setSort: function(sortstring){
+        sort = eval(sortstring  )
+    }
+}
 
 
 var markers = {
@@ -227,7 +247,7 @@ function update() {
             markers[marker].index = yieldval.value.index
         }
     }
-    Draw()
+    //Draw()
     if (!yieldval || !yieldval.done) {
         drawMarkers()
         requestAnimationFrame(update)
@@ -291,4 +311,3 @@ function Random(min, max) {
 
 
 Draw()
-update()

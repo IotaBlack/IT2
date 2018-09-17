@@ -18,5 +18,17 @@
 </head>
 <body>
     <canvas id="cvs" width="1000" height="1000"></canvas>
+    Speed:<input type="number" min="0" max="100" name="speed" value="10" onchange="input.changeSpeed(this.value)">
+
+
+    <input type="button" value="Shuffle" onclick="input.shuffle()">
+    <input type="button" value="start" onclick="input.start()">
+    <select onchange="input.setSort(this.value)">
+        <option value="sorts.bubble(list)">Bubble sort</option>
+        <option value="sorts.selection(list)">Selection sort</option>
+        <option value="sorts.insertion(list)">Insertion sort</option>
+        <option value="sorts.merge(list, 0, list.length-1)">Merge sort</option>
+        <option value="sorts.quick(list, 0, list.length - 1)">Quick sort</option>
+    </select>
 </body>
 </html>
