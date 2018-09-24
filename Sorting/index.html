@@ -24,11 +24,16 @@
     <input type="button" value="Shuffle" onclick="input.shuffle()">
     <input type="button" value="start" onclick="input.start()">
     <select onchange="input.setSort(this.value)">
-        <option value="sorts.bubble(list)">Bubble sort</option>
+        <option value="sorts.bubble(list)" selected>Bubble sort</option>
         <option value="sorts.selection(list)">Selection sort</option>
         <option value="sorts.insertion(list)">Insertion sort</option>
         <option value="sorts.merge(list, 0, list.length-1)">Merge sort</option>
         <option value="sorts.quick(list, 0, list.length - 1)">Quick sort</option>
+        <option value="sorts.radixLSD(list,2)">Radix(LSD2)</option>
+        <option value="sorts.radixLSD(list,4)">Radix(LSD4)</option>
+        <option value="sorts.radixLSD(list,8)">Radix(LSD8)</option>
+        <option value="sorts.radixLSD(list,10)">Radix(LSD10)</option>
+        <option value="sorts.radixLSD(list,16)">Radix(LSD16)</option>
     </select>
 </body>
 </html>

@@ -16,8 +16,13 @@ var dcvs = new Canvas(ctx.getImageData(0, 0, cvs.width, cvs.height))
 
 var list = new Array(numItems)
 
-for (let i = 0; i < list.length; i++) {
-    list[i] = list.length - i
+for (let i = 0; i < numItems; i++) {
+    //list[i] = Random(0,numItems) //random
+    list[i] = i //line
+    //list[i] = Math.pow(i,5)/Math.pow(numItems,4) //curve
+    //list[i] = Math.pow(i-(numItems/2),5)/Math.pow(numItems/2,4)+numItems/2 //curve2
+    //list[i] = (Math.sin(i/numItems*50)+1)*numItems/2 //sin
+    //list[i] = ((Math.sin(i/numItems*20)+1)*(numItems/2)*.9)+((Math.sin(i/numItems*250)+1)*(numItems/2)*.1) //sin2
 }
 
 function shuffle(arr) {
@@ -164,6 +169,34 @@ var sorts = {
             yield* this.binaryQuick(arr, left, partitionIndex - 1, bit + 1);
             yield* this.binaryQuick(arr, partitionIndex + 1, right, bit + 1);
         }
+    },
+
+    radixLSD: function* (arr,digits){
+        let maxDigits = Math.max(...arr).toString(digits).length
+        let buckets = Array(digits)
+        
+        for (let i = 1; i <= maxDigits; i++) {
+            for (let i = 0; i < buckets.length; i++) {
+                buckets[i] = []
+            }
+            for (let j = 0; j < arr.length; j++) {
+                let num = arr[j];
+                let digit = num.toString(digits).padStart(maxDigits,0)[maxDigits-i]
+                
+                buckets[parseInt(digit,digits)].push(num)
+                yield { marker: 'red', index: j }
+            }
+            let result = buckets.flat()
+            for (let i = 0; i < result.length; i++) {
+                arr[i] = result[i];
+                sorts.swap(arr,i,i)
+                yield { marker: 'blue', index: i }
+            }
+        }
+
+
+        yield
+
     }
 }
 
@@ -201,12 +234,13 @@ sorts.merge.merge = function* (arr, left, mid, right) {
 }
 
 var sort
-//var sort = sorts.bubble(list)
+var sort = sorts.bubble(list)
 //var sort = sorts.selection(list)
 //var sort = sorts.insertion(list)
 //var sort = sorts.merge(list, 0, list.length-1)
 //var sort = sorts.quick(list, 0, list.length - 1)
 //var sort = sorts.binaryQuick(list, 0, list.length - 1, 1)
+var sort = sorts.radixLSD(list,2)
 
 var input = {
     shuffle: function(){

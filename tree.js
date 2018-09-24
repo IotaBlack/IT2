@@ -2,16 +2,24 @@ var baseURL = {
     api: 'https://api.github.com/repos/TheGrandCircuit/IT2/',
     raw: 'https://raw.githubusercontent.com/TheGrandCircuit/IT2/master/',
     page: 'https://thegrandcircuit.github.io/IT2/',
+    parameters: {
+        token: 'access_token=8301ab86754739755fce14e5a8598761ece47714'
+    }
 }
 var Descriptions = {}
+var Tree = {}
 async function getSha() {
     return new Promise(resolve => {
         var xhr = new XMLHttpRequest()
-        xhr.open('GET', baseURL.api + 'branches', true)
+        xhr.open('GET', baseURL.api + 'branches?' + baseURL.parameters.token, true)
         xhr.onload = function () {
-            resolve(
-                JSON.parse(this.response)[0].commit.sha
-            )
+            if (this.status == 200) {
+                resolve(
+                    JSON.parse(this.response)[0].commit.sha
+                )
+            } else {
+                alert(this.response)
+            }
         }
         xhr.send()
     })
@@ -22,38 +30,46 @@ async function getRawTree() {
     var tree = await getSha()
     return new Promise(resolve => {
         var xhr = new XMLHttpRequest()
-        xhr.open('GET', baseURL.api + 'git/trees/' + tree + '?recursive=1', true)
+        xhr.open('GET', baseURL.api + 'git/trees/' + tree + '?recursive=1&' + baseURL.parameters.token, true)
         xhr.onload = function () {
-            resolve(JSON.parse(this.response))
+            if (this.status == 200) {
+                resolve(JSON.parse(this.response))
+            } else {
+                alert(this.response)
+            }
         }
         xhr.send()
     })
 }
 
 /**@description Parses the raw tree */
-function parseTree(rawTree) {
-    var tree = { content: {}, sha: rawTree.sha, url: rawTree.url }
-    for (let i = 0; i < rawTree.tree.length; i++) {
-        const element = rawTree.tree[i];
-        /**@type {Array} */
-        var path = element.path.split('/')
-        if (path[path.length - 1] == 'DESCRIPTION.TXT') {
-            getTextFile(element.path).then(loadDesc)
-            continue
+async function parseTree(rawTree) {
+    return new Promise(async resolve => {
+        var tree = { content: {}, sha: rawTree.sha, url: rawTree.url, path: 'Root', type: 'tree' }
+        for (let i = 0; i < rawTree.tree.length; i++) {
+            const element = rawTree.tree[i];
+            /**@type {Array} */
+            var path = element.path.split('/')
+            if (path[path.length - 1] == 'DESCRIPTION.TXT') {
+                loadDesc(await getTextFile(element.path))
+                continue
+            }
+            var target = tree
+            for (let j = 0; j < path.length - 1; j++) {
+                target = target.content[path[j]]
+            }
+            element.content = {}
+            target.content[path[path.length - 1]] = element
         }
-        var target = tree
-        for (let j = 0; j < path.length - 1; j++) {
-            target = target.content[path[j]]
-        }
-        element.content = {}
-        target.content[path[path.length - 1]] = element
-    }
-    return tree
+        var tree2 = { content: {}, sha: rawTree.sha, url: rawTree.url, path: 'tree2' }
+        tree = { content: { tree: tree }, type: 'tree' }
+        resolve(tree)
+    })
 }
 
 /**@description loads the tree to the DOM */
 async function loadTree() {
-    var tree = parseTree(await getRawTree())
+    var tree = await parseTree(await getRawTree())
     return new Promise(resolve => {
         var div = document.getElementById('tree')
         /**@param item
@@ -107,10 +123,10 @@ async function loadTree() {
                     viewDesc(e.target.dataset.path)
                 })
                 //add a link
-                    name.addEventListener('dblclick', e => {
-                        window.open(baseURL.page + e.target.dataset.path)
-                    })
-                
+                name.addEventListener('dblclick', e => {
+                    window.open(baseURL.page + e.target.dataset.path)
+                })
+
                 DOMElement.appendChild(name)
 
                 //if folder load the contents
@@ -140,7 +156,11 @@ async function getTextFile(path) {
         var xhr = new XMLHttpRequest()
         xhr.open('GET', baseURL.raw + path, true)
         xhr.onload = function () {
-            resolve(this.response)
+            if (this.status == 200) {
+                resolve(this.response)
+            } else {
+                alert(this.response)
+            }
         }
         xhr.send()
     })
@@ -150,7 +170,7 @@ async function getTextFile(path) {
 async function loadDesc(text) {
     var descriptions = text.split('#')
     for (let i = 1; i < descriptions.length; i += 2) {
-        Descriptions[descriptions[i]] = descriptions[i + 1].replace('\n', '').trim();
+        Descriptions[descriptions[i].split(';')[0]] = descriptions[i + 1].replace('\n', '').trim();
 
     }
 }
@@ -159,6 +179,17 @@ async function loadDesc(text) {
 function viewDesc(path) {
     var box = document.getElementById('desc')
     box.innerHTML = Descriptions[path] || 'This item has no description.'
+}
+
+/**@param {XMLHttpRequest} xhr  */
+function buildAuthHeader(xhr){
+    xhr.setRequestHeader('Authorization', 'token '+localStorage.authToken)
+}
+
+function authorize(){
+    var state = (Math.random()*10000).toString(16)
+    localStorage.setItem('state',state)
+        open('https://github.com/login/oauth/authorize?client_id=2833b352b7b6f3738102&redirect_uri=https://thegrandcircuit.github.io/IT2/auth.html&state='+state)
 }
 
 loadTree()
