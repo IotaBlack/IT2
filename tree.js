@@ -186,10 +186,5 @@ function buildAuthHeader(xhr){
     xhr.setRequestHeader('Authorization', 'token '+localStorage.authToken)
 }
 
-function authorize(){
-    var state = (Math.random()*10000).toString(16)
-    localStorage.setItem('state',state)
-        open('https://github.com/login/oauth/authorize?client_id=2833b352b7b6f3738102&redirect_uri=https://thegrandcircuit.github.io/IT2/auth.html&state='+state)
-}
 
 loadTree()

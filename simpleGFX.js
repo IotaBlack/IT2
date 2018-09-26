@@ -32,7 +32,8 @@ class Canvas {
         return this
     }
     /** @param {Number[]} c  */
-    setColor(c) {
+    setColor(a,b) {
+        var c =  a || b
         this.color = c.slice()
     }
 
