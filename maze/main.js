@@ -3,9 +3,11 @@ var cvs = document.getElementById('cvs')
 var ctx = cvs.getContext('2d')
 
 
-var size = { x: 100 + 1, y: 100 + 1 }
-var scale = { x: 7, y: 7 }
-var iterationsPerFrame = 10
+var size = { x: 700 + 1, y: 700 + 1 }
+//canvas target size
+var cvsSize = { x: 700, y: 700 }
+var scale = { x: Math.ceil(cvsSize.x / size.x), y: Math.ceil(cvsSize.y / size.y) }
+var iterationsPerFrame = 100
 var iterationsToDo = 0
 cvs.style.width = cvs.width = size.x * scale.x
 cvs.style.height = cvs.height = size.y * scale.y
@@ -17,60 +19,55 @@ var dcvs = new Canvas(ctx.getImageData(0, 0, cvs.width, cvs.height))
 
 var running = false
 var Debug = false
-var Grid = []
 var gridcolors = [[255, 255, 255, 255],
 [0, 0, 0, 255],
 [0, 255, 0, 255]]
+/**@type {Maze}*/
 var maze
-var Caver1
+/**@type {Caver} */
+var generator
 
 
 function Setup() {
-
-
-    for (i = 0; i < size.x; i++) {
-        Grid[i] = []
-        for (j = 0; j < size.y; j++) {
-            Grid[i][j] = 1
-        }
-    }
-    maze = new Maze(Grid, 2)
-    Caver1 = new caver(1, 1, maze)
-    for (i = 0; i < Grid.length; i++) {
-        for (j = 0; j < Grid.length; j++) {
-            dcvs.setColor(gridcolors[Grid[i][j]])
-            dcvs.rect(i * scale.x, j * scale.y, scale.x, scale.y)
-        }
-    }
+    maze = new Maze(size.x, size.y, 1, 2)
+    generator = new Prim(1, 1, maze, 1, 0)
+    Draw()
     if (!running) {
         Tick()
         running = true
     }
 }
 
-var stepsize = 10
-
-function Draw(){
-    for (i = 0; i < size.x; i++) {
-        for (j = 0; j < size.y; j++) {
-            dcvs.setColor(gridcolors[Grid[i][j]])
+function Draw() {
+    for (i = 0; i < maze.size.x; i++) {
+        for (j = 0; j < maze.size.y; j++) {
+            dcvs.setColor(gridcolors[maze.grid[i][j]], [255, 0, 0, 255])
             dcvs.rect(i * scale.x, j * scale.y, scale.x, scale.y)
         }
     }
+    ctx.putImageData(dcvs.src, 0, 0)
 }
 function Tick() {
-    Caver1.run(stepsize)
+    generator.run(iterationsPerFrame)
     ctx.putImageData(dcvs.src, 0, 0)
 
-    if (!Caver1.finished) {
+    if (!generator.finished) {
         requestAnimationFrame(Tick)
     }
 }
 
-function Maze(grid, distance) {
-    this.grid = grid
+function Maze(x, y, init, distance) {
+    this.grid = []
+    this.size = { x: x, y: y }
     this.distance = distance || 2
     this.directiondefinitions = { left: { x: -1, y: 0 }, right: { x: +1, y: 0 }, up: { x: 0, y: -1 }, down: { x: 0, y: +1 } }
+
+    for (i = 0; i < x; i++) {
+        this.grid[i] = []
+        for (j = 0; j < y; j++) {
+            this.grid[i][j] = init
+        }
+    }
 }
 
 Maze.prototype.getNeighborDirections = function (x, y, values, d) {
@@ -94,17 +91,17 @@ Maze.prototype.getNeighborDirections = function (x, y, values, d) {
  * @param {Number} target 
  * @param {Number} trace 
  */
-function caver(x, y, maze, distance, target, trace) {
+function Caver(x, y, maze, target, trace, distance) {
     this.pos = { x: x, y: y }
     this.maze = maze
     this.pathmem = []
     this.finished = false
     this.distance = distance || 2
-    this.maze.grid[this.pos.x][this.pos.y] = 0
     this.target = (target != undefined) ? target : 1
-    this.trace = trace || 0
+    this.trace = (trace != undefined) ? trace : 0
+    this.maze.grid[this.pos.x][this.pos.y] = 0
 }
-caver.prototype.run = function (steps) {
+Caver.prototype.run = function (steps) {
     var directions = []
     var step = steps
     while (!this.finished & step > 0) {
@@ -146,6 +143,61 @@ caver.prototype.run = function (steps) {
  * @param {Number} y 
  * @param {Maze} maze 
  */
+function Prim(x, y, maze, target, trace, distance) {
+    this.pos = { x: x, y: y }
+    this.maze = maze
+    this.pathmem = []
+    this.toExplore = [{ x: x, y: y }]
+    this.finished = false
+    this.distance = distance || 2
+    this.target = (target != undefined) ? target : 1
+    this.trace = (trace != undefined) ? trace : 0
+}
+Prim.prototype.run = function (steps) {
+    var directions = []
+    var step = steps
+    while (!this.finished & step > 0) {
+        step--
+        var pos = this.toExplore.splice(Random(0, this.toExplore.length - 1), 1)[0]
+        if (!pos) {
+            this.finished = true
+            break
+        }
+        dcvs.setColor(gridcolors[this.trace])
+        dcvs.rect(pos.x * scale.x, pos.y * scale.y, scale.x, scale.y)
+        this.maze.grid[pos.x][pos.y] = this.trace
+
+        directions = this.maze.getNeighborDirections(pos.x, pos.y, [this.trace], this.distance)
+
+        var direction = directions[Random(0,directions.length-1)]
+        var pos2 = Object.assign({}, pos)
+        for (let i = 0; i < this.distance && direction != undefined; i++) {
+            pos2.x += direction.x
+            pos2.y += direction.y
+
+            dcvs.setColor(gridcolors[this.trace])
+            dcvs.rect(pos2.x * scale.x, pos2.y * scale.y, scale.x, scale.y)
+
+            this.maze.grid[pos2.x][pos2.y] = this.trace
+
+        }
+
+        directions = this.maze.getNeighborDirections(pos.x, pos.y, [this.target], this.distance)
+        for (let i = 0; i < directions.length; i++) {
+            direction = directions[i]
+            var cell = { x: pos.x + direction.x*this.distance, y: pos.y + direction.y*this.distance }
+            this.maze.grid[cell.x][cell.y] = 2
+            this.toExplore.push(cell)
+        }
+    }
+}
+
+/**
+ * 
+ * @param {Number} x 
+ * @param {Number} y 
+ * @param {Maze} maze 
+ */
 function flooder(x, y, maze, target, trace) {
     this.pos = { x: x, y: y }
     this.maze = maze
@@ -179,19 +231,15 @@ flooder.prototype.run = function (steps) {
 
 /**
  * 
- * @param {Number[]} maze 
+ * @param {Maze} maze 
  */
 function saveMaze(maze) {
     /**@type {Number[]}*/
-    var maze1D = maze.flat()
-
-    var length = Math.floor(maze1D.length / 32)
-    length += (maze1D.length % 32) ? 1 : 0
+    var maze1D = maze.grid.flat()
 
     var mazeArray = []
 
     var byte = 0
-    var bit = 0
     var byteStr = ''
     while (maze1D.length) {
         var cell = maze1D.pop()
@@ -202,17 +250,21 @@ function saveMaze(maze) {
             byteStr = ''
         }
     }
+    var num = parseInt(byteStr, 2)
+    mazeArray[byte++] = num
+    byteStr = ''
 
-    return { width: maze.length, height: maze[0].length, src: mazeArray }
+    return { width: maze.grid.length, height: maze.grid[0].length, src: mazeArray }
 }
 
 function loadMaze(maze) {
     var rawString = ''
     var grid = []
-    for (let i = 0; i < maze.src.length; i++) {
-        rawString += maze.src[i].toString(2)
+    for (let i = 0; i < maze.src.length - 1; i++) {
+        rawString += maze.src[i].toString(2).padStart(32, '0')
     }
-
+    rawString += maze.src[maze.src.length - 1].toString(2).
+        rawString = rawString.substr(0, maze.height * maze.width)
     var row = 0
     while (rawString.length) {
         var segment = rawString.substr(0, maze.width)
@@ -220,14 +272,27 @@ function loadMaze(maze) {
 
         segment = segment.split('')
         grid[row] = []
-        for (let i = 0; i < segment.length; i++) {
-            grid[row][i] = segment.shift()
+        let length = segment.length
+        for (let i = 0; i < length; i++) {
+            grid[row][i] = parseInt(segment.shift())
         }
         row++
     }
 
     return grid
 
+}
+
+/**
+ * 
+ * @param {Number} max 
+ * @param {Number} min 
+ */
+function Random(min, max) {
+    let range = max - min + 1
+    let value = Math.random() * range + min
+
+    return Math.floor(value)
 }
 
 Setup()
