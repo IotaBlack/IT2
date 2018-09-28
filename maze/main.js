@@ -25,21 +25,17 @@ var maze
 var generator
 var generatorStr = "alert('Select a generator')"
 var input = {
-
     setSpeed: function (value) {
         iterationsPerFrame = value
     },
-
     start: function () {
         Setup()
     },
-
     setGenerator: function (generatorstring) {
         generatorStr = generatorstring
     },
-
-    setSize: function (size){
-        size = {x:size%2+1,y:size%2+1}
+    setSize: function (size) {
+        size = { x: size % 2 + 1, y: size % 2 + 1 }
     }
 }
 
@@ -54,7 +50,7 @@ function Setup() {
     dcvs.scale = scale
 
 
-    maze = new Maze(size.x, size.y, 1, 2)
+    maze = new Grid(size.x, size.y, 1, 2)
     generator = eval(generatorStr)
     debugger
     Draw()
@@ -62,6 +58,11 @@ function Setup() {
         Tick()
         running = true
     }
+}
+
+function flood(){
+    generator = flooder(1,1,maze)
+    Tick()
 }
 
 function Draw() {
@@ -86,7 +87,7 @@ function Tick() {
     } else { running = false }
 }
 
-function Maze(x, y, init, distance) {
+function Grid(x, y, init, distance) {
     this.grid = []
     this.size = { x: x, y: y }
     this.distance = distance || 2
@@ -100,7 +101,7 @@ function Maze(x, y, init, distance) {
     }
 }
 
-Maze.prototype.fill = function (x, y, w, h, v) {
+Grid.prototype.fill = function (x, y, w, h, v) {
     for (i = x; i < w; i++) {
         for (j = y; j < h; j++) {
             this.grid[i][j] = v
@@ -108,7 +109,7 @@ Maze.prototype.fill = function (x, y, w, h, v) {
     }
 }
 
-Maze.prototype.getNeighborDirections = function (x, y, values, d) {
+Grid.prototype.getNeighborDirections = function (x, y, values, d) {
     d = d || this.distance
     var directions = []
     if (this.grid[x - d] && values.includes(this.grid[x - d][y])) { directions.push(this.directiondefinitions.left) }
