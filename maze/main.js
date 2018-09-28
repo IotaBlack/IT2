@@ -9,12 +9,13 @@ var cvsSize = {}
 var scale = {}
 var iterationsPerFrame = 10
 var iterationsToDo = 1
+var absoluteSpeed = true
+var animationFrameID = 0
 /**@type {Canvas} */
 var dcvs = new Canvas(ctx.getImageData(0, 0, cvs.width, cvs.height))
 
 
 
-var running = false
 var Debug = false
 var gridcolors = [[255, 255, 255, 255],
 [0, 0, 0, 255],
@@ -23,10 +24,10 @@ var gridcolors = [[255, 255, 255, 255],
 var maze
 /**@type {Generator} */
 var generator
-var generatorStr = "alert('Select a generator')"
+var generatorStr = "Caver(1, 1, maze, 1, 0)"
 var input = {
     setSpeed: function (value) {
-        iterationsPerFrame = value
+        iterationsPerFrame = parseFloat(value)
     },
     start: function () {
         Setup()
@@ -35,7 +36,7 @@ var input = {
         generatorStr = generatorstring
     },
     setSize: function (newsize) {
-        size = { x: newsize - newsize % 2 + 1, y:newsize - newsize % 2 + 1 }
+        size = { x: newsize - newsize % 2 + 1, y: newsize - newsize % 2 + 1 }
     }
 }
 
@@ -53,14 +54,12 @@ function Setup() {
     maze = new Grid(size.x, size.y, 1, 2)
     generator = eval(generatorStr)
     Draw()
-    if (!running) {
-        Tick()
-        running = true
-    }
+    cancelAnimationFrame(animationFrameID)
+    Tick()
 }
 
-function flood(){
-    generator = flooder(1,1,maze)
+function flood() {
+    generator = flooder(1, 1, maze)
     Tick()
 }
 
@@ -82,8 +81,8 @@ function Tick() {
     //Draw()
     ctx.putImageData(dcvs.src, 0, 0)
     if (!ret.done) {
-        requestAnimationFrame(Tick)
-    } else { running = false }
+        animationFrameID = requestAnimationFrame(Tick)
+    }
 }
 
 function Grid(x, y, init, distance) {
@@ -282,10 +281,8 @@ function* Divider(maze, x1, y1, x2, y2, roomval = 0, wallval = 1, divideFuncWall
  * @param {Maze} maze 
  */
 function* flooder(x, y, maze, target, trace) {
-    pos = { x: x, y: y }
-    maze = maze
-    pathmem = []
-    toExplore = [{ x: x, y: y }]
+    var pos = { x: x, y: y }
+    var toExplore = [{ x: x, y: y }]
     target = target || 0
     trace = trace || 2
 
@@ -293,6 +290,7 @@ function* flooder(x, y, maze, target, trace) {
     var directions = []
     while (true) {
         yield
+        if (absoluteSpeed) { iterationsPerFrame = toExplore.length }
         var pos = toExplore.shift()
         if (!pos) { return }
         dcvs.setColor([0, 0, 255, 255])

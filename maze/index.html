@@ -33,7 +33,6 @@
     </div>
 
     <select onchange="input.setGenerator(this.value)" style="float:left" class="pad">
-        <option value="alert('Select a generator')">Select generator</option>
         <option value="Caver(1, 1, maze, 1, 0)">Caver</option>
         <option value="Prim(1, 1, maze, 1, 0)">Prim</option>
         <option value="maze.fill(1, 1, size.x - 1, size.y - 1, 0);
@@ -43,6 +42,7 @@
                 Divider(maze, 1, 1, size.x - 2, size.y - 2, 0, 1)">Divider(random)</option>
     </select>
     <input type="button" value="start" onclick="input.start()" class="pad" style="width:100px">
+    <input type="button" value="flood" onclick="flood()" class="pad" style="width:100px">
 </body>
 
 </html>
