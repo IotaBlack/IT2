@@ -19,6 +19,7 @@ class Canvas {
         this.color = [0, 0, 0, 255]
         this.clearColor = [255,255,255,255]
         this.image = []
+        this.scale = {x:1,y:1}
 
         for (let i = 0; i < this.width; i++) {
             this.image[i] = []
@@ -43,10 +44,10 @@ class Canvas {
      *  @param {Number} h 
      */
     rect(x, y, w, h) {
-        x = Math.floor(x)
-        y = Math.floor(y)
-        w = Math.floor(w)
-        h = Math.floor(h)
+        x = Math.floor(x)*this.scale.x
+        y = Math.floor(y)*this.scale.y
+        w = Math.floor(w)*this.scale.x
+        h = Math.floor(h)*this.scale.y
         for (let i = 0; i < w; i++) {
             for (let j = 0; j < h; j++) {
                 let index = pointToIndex(i + x, j + y, this.width)
@@ -54,12 +55,17 @@ class Canvas {
                 this.src.data[index + 1] = this.color[1]
                 this.src.data[index + 2] = this.color[2]
                 this.src.data[index + 3] = this.color[3]
-                /**this.image[i+x][j+y][0] = this.color[0]
-                this.image[i+x][j+y][1] = this.color[1]
-                this.image[i+x][j+y][2] = this.color[2]
-                this.image[i+x][j+y][3] = this.color[3]**/
             }
         }
+    }
+
+    pixel(x,y){
+        
+        let index = pointToIndex(x,y, this.width)
+        this.src.data[index + 0] = this.color[0]
+        this.src.data[index + 1] = this.color[1]
+        this.src.data[index + 2] = this.color[2]
+        this.src.data[index + 3] = this.color[3]
     }
 
     /** @param {Number} x
@@ -67,11 +73,11 @@ class Canvas {
      *  @param {Number} w
      *  @param {Number} h
      */
-    clearRect(x, y, w, h,color) {
-        x = Math.floor(x)
-        y = Math.floor(y)
-        w = Math.floor(w)
-        h = Math.floor(h)
+    clearRect(x, y, w, h) {
+        x = Math.floor(x)*this.scale.x
+        y = Math.floor(y)*this.scale.y
+        w = Math.floor(w)*this.scale.x
+        h = Math.floor(h)*this.scale.y
         for (let i = 0; i < w; i++) {
             for (let j = 0; j < h; j++) {
                 let index = pointToIndex(i + x, j + y, this.width)

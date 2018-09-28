@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -17,8 +18,22 @@
         }
     </style>
 </head>
+
 <body>
     <canvas id="cvs" width="700" height="700"></canvas>
-    
+    Size:<input type="number" min="10" max="1000" name="size" value="100" onchange="input.setSize(this.value)">
+    Speed:<input type="number" min="0" max="1000" name="speed" value="10" onchange="input.setSpeed(this.value)">
+    <input type="button" value="start" onclick="input.start()">
+    <select onchange="input.setGenerator(this.value)">
+        <option value="alert('Select a generator')">Select generator</option>
+        <option value="Caver(1, 1, maze, 1, 0)">Caver</option>
+        <option value="Prim(1, 1, maze, 1, 0)">Prim</option>
+        <option value="maze.fill(1, 1, size.x - 1, size.y - 1, 0);
+        Divider(maze, 1, 1, size.x - 2, size.y - 2, 0, 1,
+        (min, max) => { return min + Math.ceil((max - min) / 2) })">Divider</option>
+        <option value="maze.fill(1, 1, size.x - 1, size.y - 1, 0);
+        Divider(maze, 1, 1, size.x - 2, size.y - 2, 0, 1)">Divider(random)</option>
+    </select>
 </body>
+
 </html>
