@@ -34,8 +34,8 @@ var input = {
     setGenerator: function (generatorstring) {
         generatorStr = generatorstring
     },
-    setSize: function (size) {
-        size = { x: size % 2 + 1, y: size % 2 + 1 }
+    setSize: function (newsize) {
+        size = { x: newsize - newsize % 2 + 1, y:newsize - newsize % 2 + 1 }
     }
 }
 
@@ -52,7 +52,6 @@ function Setup() {
 
     maze = new Grid(size.x, size.y, 1, 2)
     generator = eval(generatorStr)
-    debugger
     Draw()
     if (!running) {
         Tick()
